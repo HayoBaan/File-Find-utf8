@@ -50,6 +50,10 @@ L<File::Find>), if you want to prevent this, use C<use File::Find::utf8
 qw(:none)>. (As all the magic happens in the module's import function,
 you can not simply use C<use File::Find::utf8 qw()>)
 
+L<File::Find> warning levels are properly propagated. Note though that
+for propagation of fatal L<File::Find> warnings, Perl 5.12 or higher
+is required (or the appropriate version of L<warnings>).
+
 =head1 SEE ALSO
 
 =for :list
@@ -170,7 +174,7 @@ sub _utf8_find {
     if (!warnings::enabled('File::Find')) {
         no warnings 'File::Find';
         return $_orig_functions{find}->(\%find_options_hash, @args);
-    } elsif (!warnings::fatal_enabled('File::Find')) {
+    } elsif (!exists &warnings::fatal_enabled or !warnings::fatal_enabled('File::Find')) {
         use warnings 'File::Find';
         return $_orig_functions{find}->(\%find_options_hash, map { encode('UTF-8', $_) } @_);
     } else {
