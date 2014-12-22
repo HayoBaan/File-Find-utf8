@@ -10,8 +10,8 @@ my $test_root     = "test_files";
 my $unicode_file  = "\x{30c6}\x{30b9}\x{30c8}\x{30d5}\x{30a1}\x{30a4}\x{30eb}";
 my $unicode_dir   = "\x{30c6}\x{30b9}\x{30c8}\x{30c6}\x{3099}\x{30a3}\x{30ec}\x{30af}\x{30c8}\x{30ea}";
 
-if ($^O eq 'Win32' or $^O eq 'dos' or $^O eq 'os2') {
-    plan skip_all => "Ignored: $^O does not have proper utf-8 file system";
+if ($^O eq 'dos' or $^O eq 'os2') {
+    plan skip_all => "Skipped: $^O does not have proper utf-8 file system support";
 } else {
     # Create test files
     mkdir $test_root
@@ -92,7 +92,7 @@ subtest warninglevels => sub {
             #use warnings 'File::Find'; # This is actually the default
             find( { no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
         }
-        qr/Permission denied/, 'Warning for unaccessible directory' or diag $@;
+        qr/Can't opendir/, 'Warning for unaccessible directory' or diag $@;
 
     # Test fatal warnings in File::Find
     warning_like
@@ -103,7 +103,7 @@ subtest warninglevels => sub {
             };
             warn $@;
         }
-        qr/Permission denied/, 'Warning for unaccessible directory' or diag $@;
+        qr/Can't opendir/, 'Warning for unaccessible directory' or diag $@;
 
     # Reset directory permissions
     chmod 0755, "$test_root/$unicode_dir" or die "Failed to grant access to $test_root/$unicode_dir: $!";

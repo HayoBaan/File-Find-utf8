@@ -36,7 +36,7 @@ characters.
 This module replaces the L<File::Find> functions with fully UTF-8
 aware versions, both expecting and returning characters.
 
-B<Note:> Replacement of functions is not done on Win32, DOS, and OS/2
+B<Note:> Replacement of functions is not done on DOS and OS/2
 as these systems do not have full UTF-8 file system support.
 
 =head2 Behaviour
@@ -82,9 +82,9 @@ sub import {
     no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no warnings qw(redefine);
 
-    # If run on the dos/os2/windows platform, ignore overriding functions silently.
+    # If run on the DOS or OS/2 platform, ignore overriding functions silently.
     # These platforms do not (properly) suppport utf-8 filenames...
-    unless ($^O eq 'Win32' or $^O eq 'dos' or $^O eq 'os2') {
+    unless ($^O eq 'dos' or $^O eq 'os2') {
         no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no warnings qw(redefine);
 
