@@ -20,7 +20,7 @@ my %module_build_args = (
     "Hayo Baan <info\@hayobaan.nl>"
   ],
   "dist_name" => "File-Find-utf8",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "perl",
   "module_name" => "File::Find::utf8",
   "recommends" => {},

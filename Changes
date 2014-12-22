@@ -2,6 +2,12 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.002     2014-12-22
+
+  - Not testing warnings::fatal_enabled if not present (i.e. Perl < 5.12)
+  - Allowing Win32 platform
+  - Corrected warning test to be language independent
+
 0.001     2014-12-21
 
   - Initial release

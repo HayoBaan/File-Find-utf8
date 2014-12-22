@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.001
+    version 0.002
 
 SYNOPSIS
 
@@ -33,8 +33,8 @@ DESCRIPTION
     This module replaces the File::Find functions with fully UTF-8 aware
     versions, both expecting and returning characters.
 
-    Note: Replacement of functions is not done on Win32, DOS, and OS/2 as
-    these systems do not have full UTF-8 file system support.
+    Note: Replacement of functions is not done on DOS and OS/2 as these
+    systems do not have full UTF-8 file system support.
 
  Behaviour
 
@@ -45,6 +45,10 @@ DESCRIPTION
     original File::Find), if you want to prevent this, use use
     File::Find::utf8 qw(:none). (As all the magic happens in the module's
     import function, you can not simply use use File::Find::utf8 qw())
+
+    File::Find warning levels are properly propagated. Note though that for
+    propagation of fatal File::Find warnings, Perl 5.12 or higher is
+    required (or the appropriate version of warnings).
 
 SEE ALSO
 
