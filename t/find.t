@@ -20,7 +20,6 @@ if ($^O eq 'dos' or $^O eq 'os2') {
     mkdir "$test_root/$unicode_dir"
         or die "Unable to create directory $test_root/$unicode_dir: $!"
         unless -d "$test_root/$unicode_dir";
-    chmod 0755, "$test_root/$unicode_dir" or die "Failed to grant access to $test_root/$unicode_dir: $!";
     for ("$unicode_dir/bar", $unicode_file) {
         open my $touch, '>', "$test_root/$_" or die "Couldn't open $test_root/$_ for writing: $!";
         close   $touch                       or die "Couldn't close $test_root/$_: $!";
@@ -72,39 +71,32 @@ for my $test (0, 1) {
 subtest warninglevels => sub {
     plan tests => 3;
 
-    # Remove access to unicode_dir
-    chmod 0000, "$test_root/$unicode_dir" or die "Failed to revoke access to $test_root/$unicode_dir: $!";
-
     use File::Find::utf8;
-    my @utf8_files;
 
     # Test no warnings in File::Find
     warning_is
         {
             no warnings 'File::Find';
-            find( { no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
+            find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
         }
-        undef, 'No warning for unaccessible directory';
+        undef, 'No warning for non-existing directory';
 
     # Test warnings in File::Find
     warning_like
         {
             #use warnings 'File::Find'; # This is actually the default
-            find( { no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
+            find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
         }
-        qr/Can't opendir/, 'Warning for unaccessible directory' or diag $@;
+        qr/Can't stat test_files\/does_not_exist/, 'Warning for non-existing directory' or diag $@;
 
     # Test fatal warnings in File::Find
     warning_like
         {
             eval {
                 use warnings FATAL => 'File::Find';
-                find( { no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
+                find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
             };
-            warn $@;
+            warn $@ if $@;
         }
-        qr/Can't opendir/, 'Warning for unaccessible directory' or diag $@;
-
-    # Reset directory permissions
-    chmod 0755, "$test_root/$unicode_dir" or die "Failed to grant access to $test_root/$unicode_dir: $!";
+        qr/Can't stat test_files\/does_not_exist/, 'Fatal warning for non-existing directory' or diag $@;
 }
