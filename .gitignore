@@ -1,9 +1,2 @@
 /File-Find-utf8*
 /.build/
-/test_files/
-/blib/
-/pm_to_blib
-/Makefile
-/Makefile.old
-/MYMETA.json
-/MYMETA.yml

@@ -6,7 +6,7 @@ use Test::Warn;
 use Encode qw(decode FB_CROAK);
 
 # Test files
-my $test_root     = "test_files";
+my $test_root     = "test_data";
 my $unicode_file  = "\x{30c6}\x{30b9}\x{30c8}\x{30d5}\x{30a1}\x{30a4}\x{30eb}";
 my $unicode_dir   = "\x{30c6}\x{30b9}\x{30c8}\x{30c6}\x{3099}\x{30a3}\x{30ec}\x{30af}\x{30c8}\x{30ea}";
 
