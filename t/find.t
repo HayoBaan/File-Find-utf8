@@ -10,7 +10,7 @@ use Encode qw(decode FB_CROAK);
 use open qw{:encoding(UTF-8) :std};
 
 # Test files
-my $test_root     = "corpus";
+my $test_root     = "corpus.tmp";
 my $unicode_file  = "\x{30c6}\x{30b9}\x{30c8}\x{30d5}\x{30a1}\x{30a4}\x{30eb}";
 my $unicode_dir   = "\x{30c6}\x{30b9}\x{30c8}\x{30c6}\x{3099}\x{30a3}\x{30ec}\x{30af}\x{30c8}\x{30ea}";
 
@@ -48,19 +48,19 @@ for my $test (qw(find finddepth)) {
         # Use normal find to gather list of files in the test_root directory
         {
             use File::Find;
-            (\&{$test})->({ no_chdir => 1, wanted => sub { push(@files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
+            (\&{$test})->({ no_chdir => 1, wanted => sub { push(@files, $_) if $_ !~ /^\.{1,2}$/ } }, $test_root);
         }
 
         # Use utf8 version of find to gather list of files in the test_root directory
         {
             use File::Find::utf8;
-            (\&{$test})->({ no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /\.{1,2}/ } }, $test_root);
+            (\&{$test})->({ no_chdir => 1, wanted => sub { push(@utf8_files, $_) if $_ !~ /^\.{1,2}$/ } }, $test_root);
         }
 
         # Compare results
         @files      = sort @files;
         @utf8_files = sort @utf8_files;
-        is_deeply \@utf8_files, \@expected; # utf8 version should match exactly with expected results
+        is_deeply \@utf8_files, \@expected, "$test all utf8 files are present";
         is                   $files[0]            => $utf8_files[0], "$test normal directory";
         isnt                 $files[1]            => $utf8_files[1], "$test unicode file bytes != chars";
         is   decode('UTF-8', $files[1], FB_CROAK) => $utf8_files[1], "$test unicode file chars == chars";
