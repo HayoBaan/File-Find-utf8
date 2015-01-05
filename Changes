@@ -2,17 +2,23 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.005     2015-01-05
+  * Excluding Windows platform again as it's UTF-8 filesystem support
+    is incomplete
+  * Added test for "no File::Find::utf8;"
+  * More informative naming of the tests
+
 0.004     2014-12-24
-  - Corrected determination of target
+  * Corrected determination of target
 
 0.003     2014-12-24
-  - Rewrote warning level tests to also fail when run as admin
+  * Rewrote warning level tests to also fail when run as admin
     The test should now work well on all systems/circumstances
     
 0.002     2014-12-22
-  - Not testing warnings::fatal_enabled if not present (i.e. Perl < 5.12)
-  - Allowing Win32 platform
-  - Corrected warning test to be language independent
+  * Not testing warnings::fatal_enabled if not present (i.e. Perl < 5.12)
+  * Allowing Win32 platform
+  * Corrected warning test to be language independent
 
 0.001     2014-12-21
-  - Initial release
+  * Initial release
