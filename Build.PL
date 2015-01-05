@@ -20,7 +20,7 @@ my %module_build_args = (
     "Hayo Baan <info\@hayobaan.nl>"
   ],
   "dist_name" => "File-Find-utf8",
-  "dist_version" => "0.004",
+  "dist_version" => "0.005",
   "license" => "perl",
   "module_name" => "File::Find::utf8",
   "recommends" => {},
@@ -35,23 +35,27 @@ my %module_build_args = (
   },
   "script_files" => [],
   "test_requires" => {
+    "File::Path" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.96",
     "Test::Warn" => 0,
+    "open" => 0,
     "perl" => "5.010"
   }
 );
 
 
 my %fallback_build_requires = (
+  "File::Path" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test::More" => "0.96",
   "Test::Warn" => 0,
+  "open" => 0,
   "perl" => "5.010"
 );
 
