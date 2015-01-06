@@ -188,10 +188,10 @@ sub _utf8_find {
         return $_orig_functions{find}->(\%find_options_hash, @args);
     } elsif (!exists &warnings::fatal_enabled or !warnings::fatal_enabled('File::Find')) {
         use warnings 'File::Find';
-        return $_orig_functions{find}->(\%find_options_hash, map { encode('UTF-8', $_) } @_);
+        return $_orig_functions{find}->(\%find_options_hash, @args);
     } else {
         use warnings FATAL => qw(File::Find);
-        return $_orig_functions{find}->(\%find_options_hash, map { encode('UTF-8', $_) } @_);
+        return $_orig_functions{find}->(\%find_options_hash, @args);
     }
 }
 
