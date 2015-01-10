@@ -74,9 +74,6 @@ systems.
 use File::Find qw();
 use Encode;
 
-my @EXPORT = qw(find finddepth);
-my @EXPORT_OK = ();
-
 # Holds the pointers to the original version of redefined functions
 state %_orig_functions;
 
@@ -86,6 +83,9 @@ my $current_package = __PACKAGE__;
 # Original package (i.e., the one for which this module is replacing the functions)
 my $original_package = $current_package;
 $original_package =~ s/::utf8$//;
+
+require Carp;
+$Carp::Internal{$current_package}++; # To get warnings reported at correct caller level
 
 sub import {
     # Target package (i.e., the one loading this module)
@@ -98,7 +98,7 @@ sub import {
         no warnings qw(redefine);
 
         # Redefine each of the functions to their UTF-8 equivalent
-        for my $f (@EXPORT, @EXPORT_OK) {
+        for my $f (@{$original_package . '::EXPORT'}, @{$original_package . '::EXPORT_OK'}) {
             # If we already have the _orig_function, we have redefined the function
             # in an earlier load of this module, so we need not do it again
             unless ($_orig_functions{$f}) {
@@ -109,30 +109,14 @@ sub import {
         $^H{$current_package} = 1; # Set compiler hint that we should use the utf-8 version
     }
 
-    shift; # First argument contains the package
-    if (@_) {
-        # Check arguments
-        my @invalid_exports;
-        for my $f (@_) {
-            if (! grep { /^$f$/ } (':none', @EXPORT, @EXPORT_OK)) {
-                push @invalid_exports, "$f is not exported by $current_package module";
-            }
-        }
-        if (@invalid_exports) {
-            require Carp;
-            Carp::croak(join("\n", @invalid_exports)  . "\nCan't continue after import errors");
-        }
-    }
+    # Determine symbols to export
+    shift; # First argument contains the package (that's us)
+    @_ = (':DEFAULT') if !@_; # If nothing provided, use default
+    @_ = map { $_ eq ':none' ? () : $_ } @_; # Replace :none tag with empty list
 
-    # Export functions to target package
-    unless (@_ && grep { $_ eq ':none' } @_) {
-        no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
-        no warnings qw(redefine);
-
-        for my $f (@_ ? @_ : @EXPORT) {
-            *{$target_package . '::' . $f} = \&{$original_package . '::' . $f};
-        }
-    }
+    # Use exporter to export
+    require Exporter;
+    Exporter::export_to_level($original_package, 1, $target_package, @_) if (@_);
 
     return;
 }
@@ -177,9 +161,6 @@ sub _utf8_find {
         # Encode arguments as utf-8 so that the original File::Find receives bytes
         @args = map { encode('UTF-8', $_) } @_;
     }
-
-    require Carp;
-    $Carp::Internal{(__PACKAGE__)}++; # To get File::Find's warnings reported at correct caller level
 
     # Make sure warning level propagates to File::Find
     # Note: on perl prior to v5.12 warnings_fatal_enabled does not exist

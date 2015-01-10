@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Test::More 0.96;
-use Test::Warn;
 use Encode qw(encode decode FB_CROAK);
 
 # Enable utf-8 encoding so we do not get Wide character in print
@@ -27,6 +26,12 @@ for ("$unicode_dir/bar", $unicode_file) {
     close   $touch                       or die "Couldn't close $test_root/$_: $!";
 }
 
+# Cleanup temporarily created files and directories
+END {
+    use File::Path qw(remove_tree);
+    remove_tree($test_root) or die "Unable to remove $test_root";
+}
+
 # Expected output of find commands
 my @expected = sort ($test_root, "$test_root/$unicode_dir", "$test_root/$unicode_dir/bar", "$test_root/$unicode_file");
 
@@ -45,7 +50,7 @@ sub check_results {
     is_deeply \@utf8_encoded, \@non_utf8, "$test encoded utf8 files match non-utf8";
 }
 
-plan tests => 4;
+plan tests => 3;
 
 # Check find and finddepth
 for my $test (qw(find finddepth)) {
@@ -90,41 +95,3 @@ subtest no_file_find_utf8 => sub {
     # Compare results
     check_results($test, \@utf8, \@non_utf8);
 };
-
-# Check if warnings levels progate well
-subtest warninglevels => sub {
-    plan tests => 3;
-
-    use File::Find::utf8;
-
-    # Test no warnings in File::Find
-    warning_is
-        {
-            no warnings 'File::Find';
-            find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
-        }
-        undef, 'No warning for non-existing directory';
-
-    # Test warnings in File::Find
-    warning_like
-        {
-            #use warnings 'File::Find'; # This is actually the default
-            find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
-        }
-        qr/Can't stat $test_root\/does_not_exist/, 'Warning for non-existing directory' or diag $@;
-
-    # Test fatal warnings in File::Find
-    warning_like
-        {
-            eval {
-                use warnings FATAL => 'File::Find';
-                find( { no_chdir => 1, wanted => sub { } }, "$test_root/does_not_exist");
-            };
-            warn $@ if $@;
-        }
-        qr/Can't stat $test_root\/does_not_exist/, 'Fatal warning for non-existing directory' or diag $@;
-};
-
-# Cleanup temporarily created files and directories
-use File::Path qw(remove_tree);
-remove_tree($test_root) or die "Unable to remove $test_root";
