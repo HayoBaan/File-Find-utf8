@@ -36,7 +36,7 @@ characters.
 This module replaces the L<File::Find> functions with fully UTF-8
 aware versions, both expecting and returning characters.
 
-B<Note:> Replacement of functions is not done on DOS and OS/2
+B<Note:> Replacement of functions is not done on DOS, Windows, and OS/2
 as these systems do not have full UTF-8 file system support.
 
 =head2 Behaviour
@@ -80,7 +80,7 @@ my @EXPORT_OK = ();
 # Holds the pointers to the original version of redefined functions
 state %_orig_functions;
 
-# Current package
+# Current (i.e., this) package
 my $current_package = __PACKAGE__;
 
 # Original package (i.e., the one for which this module is replacing the functions)
@@ -91,11 +91,8 @@ sub import {
     # Target package (i.e., the one loading this module)
     my $target_package = caller;
 
-    no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
-    no warnings qw(redefine);
-
     # If run on the dos/os2/windows platform, ignore overriding functions silently.
-    # These platforms do have (proper) utf-8 file system suppport...
+    # These platforms do not have (proper) utf-8 file system suppport...
     unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
         no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no warnings qw(redefine);
@@ -112,11 +109,12 @@ sub import {
         $^H{$current_package} = 1; # Set compiler hint that we should use the utf-8 version
     }
 
-    if ($#_) {
+    shift; # First argument contains the package
+    if (@_) {
         # Check arguments
         my @invalid_exports;
-        for my $f (@_[1..$#_]) {
-            if (! grep /^$f$/, (':none', @EXPORT, @EXPORT_OK)) {
+        for my $f (@_) {
+            if (! grep { /^$f$/ } (':none', @EXPORT, @EXPORT_OK)) {
                 push @invalid_exports, "$f is not exported by $current_package module";
             }
         }
@@ -127,8 +125,11 @@ sub import {
     }
 
     # Export functions to target package
-    unless ($#_ && grep /^:none$/, @_[1..$#_]) {
-        for my $f ($#_ ? @_[1..$#_] : @EXPORT) {
+    unless (@_ && grep { $_ eq ':none' } @_) {
+        no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
+        no warnings qw(redefine);
+
+        for my $f (@_ ? @_ : @EXPORT) {
             *{$target_package . '::' . $f} = \&{$original_package . '::' . $f};
         }
     }
@@ -136,13 +137,8 @@ sub import {
     return;
 }
 
-sub unimport {
-    # If run on the dos/os2/windows platform, ignore overriding functions silently.
-    # These platforms do have (proper) utf-8 file system suppport...
-    unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
-        $^H{$current_package} = 0; # Set compiler hint that we should not use the utf-8 version
-    }
-
+sub unimport { ## no critic (Subroutines::ProhibitBuiltinHomonyms)
+    $^H{$current_package} = 0; # Set compiler hint that we should not use the utf-8 version
     return;
 }
 
@@ -182,7 +178,12 @@ sub _utf8_find {
         @args = map { encode('UTF-8', $_) } @_;
     }
 
-    # Make sure warning level propagates
+    require Carp;
+    $Carp::Internal{(__PACKAGE__)}++; # To get File::Find's warnings reported at correct caller level
+
+    # Make sure warning level propagates to File::Find
+    # Note: on perl prior to v5.12 warnings_fatal_enabled does not exist
+    #       so we can not use it.
     if (!warnings::enabled('File::Find')) {
         no warnings 'File::Find';
         return $_orig_functions{find}->(\%find_options_hash, @args);
