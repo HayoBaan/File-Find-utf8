@@ -182,22 +182,29 @@ sub _utf8_find {
             || (exists $find_options_hash{follow_fast} && $find_options_hash{follow_fast});
 
         # Wrap processors to become utf8-aware
-        for my $proc ("wanted", "preprocess", "postprocess") {
+        if (defined $org_proc{wanted} && ref $org_proc{wanted}) {
+            $find_options_hash{wanted} = sub {
+                # Decode the file variables so they become characters
+                local $_                    = $_UTF8->decode($_,                    $UTF8_CHECK) if $_;
+                local $File::Find::name     = $_UTF8->decode($File::Find::name,     $UTF8_CHECK) if $File::Find::name;
+                local $File::Find::dir      = $_UTF8->decode($File::Find::dir,      $UTF8_CHECK) if $File::Find::dir;
+                local $File::Find::fullname = $_UTF8->decode($File::Find::fullname, $UTF8_CHECK) if $follow_option && $File::Find::fullname;
+                # These are only necessary for compatibility reasons (find.pl, find2perl).
+                # If you need them, set $File::Find::utf8::SPECIALVARS
+                local $File::Find::topdir   = $_UTF8->decode($File::Find::topdir,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdir;
+                local $File::Find::topdev   = $_UTF8->decode($File::Find::topdev,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdev;
+                local $File::Find::topino   = $_UTF8->decode($File::Find::topino,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topino;
+                local $File::Find::topmode  = $_UTF8->decode($File::Find::topmode,  $UTF8_CHECK) if $SPECIALVARS && $File::Find::topmode;
+                local $File::Find::topnlink = $_UTF8->decode($File::Find::topnlink, $UTF8_CHECK) if $SPECIALVARS && $File::Find::topnlink;
+                return $org_proc{wanted}->(map { $_ ? $_UTF8->decode($_, $UTF8_CHECK) : $_ } @_);
+            };
+        }
+        for my $proc ("preprocess", "postprocess") {
             if (defined $org_proc{$proc} && ref $org_proc{$proc}) {
                 $find_options_hash{$proc} = sub {
                     # Decode the file variables so they become characters
-                    local $_                    = $_UTF8->decode($_,                    $UTF8_CHECK) if $_;
-                    local $File::Find::name     = $_UTF8->decode($File::Find::name,     $UTF8_CHECK) if $File::Find::name;
-                    local $File::Find::dir      = $_UTF8->decode($File::Find::dir,      $UTF8_CHECK) if $File::Find::dir;
-                    local $File::Find::fullname = $_UTF8->decode($File::Find::fullname, $UTF8_CHECK) if $follow_option && $File::Find::fullname;
-                    # These are only necessary for compatibility reasons (find.pl, find2perl).
-                    # If you need them, set $File::Find::utf8::SPECIALVARS
-                    local $File::Find::topdir   = $_UTF8->decode($File::Find::topdir,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdir;
-                    local $File::Find::topdev   = $_UTF8->decode($File::Find::topdev,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdev;
-                    local $File::Find::topino   = $_UTF8->decode($File::Find::topino,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topino;
-                    local $File::Find::topmode  = $_UTF8->decode($File::Find::topmode,  $UTF8_CHECK) if $SPECIALVARS && $File::Find::topmode;
-                    local $File::Find::topnlink = $_UTF8->decode($File::Find::topnlink, $UTF8_CHECK) if $SPECIALVARS && $File::Find::topnlink;
-                    return $org_proc{$proc}->(@_);
+                    local $File::Find::dir = $_UTF8->decode($File::Find::dir, $UTF8_CHECK) if $File::Find::dir;
+                    return $org_proc{$proc}->(map { $_ ? $_UTF8->decode($_, $UTF8_CHECK) : $_ } @_);
                 };
             }
         }
