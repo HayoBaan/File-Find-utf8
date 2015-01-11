@@ -7,13 +7,16 @@ use Test::Exception tests => 5;
 # Each test is performed in its own package to prevent one use
 # statement influencing the other.
 
+# Arguments to File::find(depth) define an empty test, not finding anything
+my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
+
 # Correct handling of the :none tag
 {
     package test_none;
     use File::Find::utf8 qw(:none);
     Test::Exception::throws_ok
         {
-            find( sub { }, '.' );
+            find(@findargs);
         }
         qr/Undefined subroutine &test_none::find called/,
         ':none correctly imported';
@@ -25,13 +28,13 @@ use Test::Exception tests => 5;
     use File::Find::utf8 qw(!find);
     Test::Exception::throws_ok
           {
-              find( sub { }, '.' );
+              find(@findargs);
           }
           qr/Undefined subroutine &test_notfind::find called/,
           'find correctly not imported with !find';
     Test::Exception::lives_ok
           {
-              finddepth( sub { }, '.' );
+              finddepth(@findargs);
           }
           'finddepth correctly imported with !find';
 }
@@ -42,8 +45,8 @@ use Test::Exception tests => 5;
     use File::Find::utf8 qw(/find/);
     Test::Exception::lives_ok
     {
-        find( sub { }, '.' );
-        finddepth( sub { }, '.' );
+        find(@findargs);
+        finddepth(@findargs);
     }
     'find and finddepth correctly imported with /find/';
 }
