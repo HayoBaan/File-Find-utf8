@@ -4,7 +4,7 @@ File::Find::utf8 - Fully UTF-8 aware File::Find
 
 # VERSION
 
-version 0.005
+version 0.006
 
 # SYNOPSIS
 
@@ -33,7 +33,7 @@ characters.
 This module replaces the [File::Find](https://metacpan.org/pod/File::Find) functions with fully UTF-8
 aware versions, both expecting and returning characters.
 
-**Note:** Replacement of functions is not done on DOS and OS/2
+**Note:** Replacement of functions is not done on DOS, Windows, and OS/2
 as these systems do not have full UTF-8 file system support.
 
 ## Behaviour
@@ -50,6 +50,33 @@ you can not simply use `use File::Find::utf8 qw()`)
 [File::Find](https://metacpan.org/pod/File::Find) warning levels are properly propagated. Note though that
 for propagation of fatal [File::Find](https://metacpan.org/pod/File::Find) warnings, Perl 5.12 or higher
 is required (or the appropriate version of [warnings](https://metacpan.org/pod/warnings)).
+
+# ATTRIBUTES
+
+## $File::Find::utf8::SPECIALVARS
+
+By default `File::Find::utf8` only decodes the _normal_
+[File::Find](https://metacpan.org/pod/File::Find) variables `$_`, `$File::Find::name`,
+`$File::Find::dir`, and (when `follow` or `follow_fast` is in
+effect) `$File::Find::fullname` for use in the `preprocess`,
+`wanted`, and `postporcess` functions.
+
+If for any reason (e.g., compatibility with find.pl or find2perl) you
+also need the _special_ variables `$File::Find::topdir`,
+`$File::Find::topdev`, `$File::Find::topino`,
+`$File::Find::topmode`, and `$File::Find::topnlink` to be decoded,
+specify `local $File::Find::utf8::COMPATILBILITY = 1;` in your
+code. The extra decoding that needs to happen will impact performance
+though, so use only when absolutely necessary.
+
+## $File::Find::utf8::UTF8\_CHECK
+
+By default `File::Find::utf8` marks decoding errors as fatal (default value
+for this setting is `Encode::FB_CROAK`). If you want, you can change this by
+setting `File::Find::utf8::UTF8_CHECK`. The value `Encode::FB_WARN` reports
+the encoding errors as warnings, and `Encode::FB_DEFAULT` will completely
+ignore them. Please see [Encode](https://metacpan.org/pod/Encode) for details. Note: `Encode::LEAVE_SRC` is
+_always_ enforced.
 
 # BUGS
 
