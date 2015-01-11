@@ -2,6 +2,17 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.006     2015-01-11
+  * Added ability to specify what to do with UTF-8 encoding errors via
+    $File::Find::utf8::UTF8_CHECK
+  * Making use of encoding object for increased speed
+  * Not decoding "special" File::Find variables unles requested via
+    $File::Find::utf8::SPECIALVARS
+  * Reporting File::Find warnings at caller level
+  * Using Exporter to Export symbols, allows for e.g.
+    "use File::Find::utf8 qw(!finddepth);"
+  * Corrected double encoding of find arguments
+
 0.005     2015-01-05
   * Excluding Windows platform again as it's UTF-8 filesystem support
     is incomplete
