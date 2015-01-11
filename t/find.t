@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More 0.96;
-use Encode qw(encode decode FB_CROAK);
+use Encode qw(encode_utf8 decode_utf8 FB_CROAK LEAVE_SRC);
 
 # Enable utf-8 encoding so we do not get Wide character in print
 # warnings when reporting test failures
@@ -40,8 +40,8 @@ sub check_results {
     my ($test, $utf8, $non_utf8) = @_;
     my @utf8     = sort @{$utf8};     # Sort to overcome difference in find and finddepth
     my @non_utf8 = sort @{$non_utf8}; # Sort to overcome difference in find and finddepth
-    my @utf8_encoded     = map { encode('UTF-8', "$_", FB_CROAK); } @utf8;     # Quotes to prevent tampering by encode/decode!
-    my @non_utf8_decoded = map { decode('UTF-8', "$_", FB_CROAK); } @non_utf8; # Quotes to prevent tampering by encode/decode!
+    my @utf8_encoded     = map { encode_utf8($_); } @utf8;
+    my @non_utf8_decoded = map { decode_utf8($_, FB_CROAK | LEAVE_SRC); } @non_utf8; # Quotes to prevent tampering by encode/decode!
 
     plan tests => 3;
 

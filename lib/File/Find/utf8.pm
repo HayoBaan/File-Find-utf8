@@ -71,8 +71,8 @@ systems.
 
 =cut
 
-use File::Find qw();
-use Encode;
+use File::Find ();
+use Encode ();
 
 # Holds the pointers to the original version of redefined functions
 state %_orig_functions;
@@ -86,6 +86,41 @@ $original_package =~ s/::utf8$//;
 
 require Carp;
 $Carp::Internal{$current_package}++; # To get warnings reported at correct caller level
+
+=attr $File::Find::utf8::SPECIALVARS
+
+By default C<File::Find::utf8> only decodes the I<normal>
+L<File::Find> variables C<$_>, C<$File::Find::name>,
+C<$File::Find::dir>, and (when C<follow> or C<follow_fast> is in
+effect) C<$File::Find::fullname> for use in the C<preprocess>,
+C<wanted>, and C<postporcess> functions.
+
+If for any reason (e.g., compatibility with find.pl or find2perl) you
+also need the I<special> variables C<$File::Find::topdir>,
+C<$File::Find::topdev>, C<$File::Find::topino>,
+C<$File::Find::topmode>, and C<$File::Find::topnlink> to be decoded,
+specify C<local $File::Find::utf8::COMPATILBILITY = 1;> in your
+code. The extra decoding that needs to happen will impact performance
+though, so use only when absolutely necessary.
+
+=cut
+
+our $SPECIALVARS = 0;
+
+=attr $File::Find::utf8::UTF8_CHECK
+
+By default C<File::Find::utf8> marks decoding errors as fatal (default value
+for this setting is C<Encode::FB_CROAK>). If you want, you can change this by
+setting C<File::Find::utf8::UTF8_CHECK>. The value C<Encode::FB_WARN> reports
+the encoding errors as warnings, and C<Encode::FB_DEFAULT> will completely
+ignore them. Please see L<Encode> for details. Note: C<Encode::LEAVE_SRC> is
+I<always> enforced.
+=cut
+
+our $UTF8_CHECK = Encode::FB_CROAK; # Die on encoding errors
+
+# UTF-8 Encoding object
+my $_UTF8 = Encode::find_encoding('UTF-8');
 
 sub import {
     # Target package (i.e., the one loading this module)
@@ -131,35 +166,43 @@ sub _utf8_find {
     #  Make argument always into the find's options hash
     my %find_options_hash = ref($ref) eq "HASH" ? %$ref : (wanted => $ref);
 
-    # Save original processors
-    my %org_proc;
-    for my $proc ("wanted", "preprocess", "postprocess") { $org_proc{$proc} = $find_options_hash{$proc}; }
-
+    # Holds the (possibly encoded) arguments
     my @args = @_;
+
+    # Enforce LEAVE_SRC
+    $UTF8_CHECK |= Encode::LEAVE_SRC if $UTF8_CHECK;
 
     # Get the hint from the caller (one level deeper if called from finddepth)
     my $hints = ((caller 1)[3]//'') ne 'File::Find::utf8::_utf8_finddepth' ? (caller 0)[10] : (caller 1)[10];
     if ($hints->{$current_package}) {
+        # Save original processors
+        my %org_proc;
+        for my $proc ("wanted", "preprocess", "postprocess") { $org_proc{$proc} = $find_options_hash{$proc}; }
+        my $follow_option = (exists $find_options_hash{follow} && $find_options_hash{follow})
+            || (exists $find_options_hash{follow_fast} && $find_options_hash{follow_fast});
+
         # Wrap processors to become utf8-aware
         for my $proc ("wanted", "preprocess", "postprocess") {
             if (defined $org_proc{$proc} && ref $org_proc{$proc}) {
                 $find_options_hash{$proc} = sub {
                     # Decode the file variables so they become characters
-                    local $_                    = decode('UTF-8', $_);
-                    local $File::Find::name     = decode('UTF-8', $File::Find::name);
-                    local $File::Find::dir      = decode('UTF-8', $File::Find::dir);
-                    local $File::Find::fullname = decode('UTF-8', $File::Find::fullname);
-                    local $File::Find::topdir   = decode('UTF-8', $File::Find::topdir);
-                    local $File::Find::topdev   = decode('UTF-8', $File::Find::topdev);
-                    local $File::Find::topino   = decode('UTF-8', $File::Find::topino);
-                    local $File::Find::topmode  = decode('UTF-8', $File::Find::topmode);
-                    local $File::Find::topnlink = decode('UTF-8', $File::Find::topnlink);
-                    $org_proc{$proc}->(@_);
+                    local $_                    = $_UTF8->decode($_,                    $UTF8_CHECK) if $_;
+                    local $File::Find::name     = $_UTF8->decode($File::Find::name,     $UTF8_CHECK) if $File::Find::name;
+                    local $File::Find::dir      = $_UTF8->decode($File::Find::dir,      $UTF8_CHECK) if $File::Find::dir;
+                    local $File::Find::fullname = $_UTF8->decode($File::Find::fullname, $UTF8_CHECK) if $follow_option && $File::Find::fullname;
+                    # These are only necessary for compatibility reasons (find.pl, find2perl).
+                    # If you need them, set $File::Find::utf8::SPECIALVARS
+                    local $File::Find::topdir   = $_UTF8->decode($File::Find::topdir,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdir;
+                    local $File::Find::topdev   = $_UTF8->decode($File::Find::topdev,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdev;
+                    local $File::Find::topino   = $_UTF8->decode($File::Find::topino,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topino;
+                    local $File::Find::topmode  = $_UTF8->decode($File::Find::topmode,  $UTF8_CHECK) if $SPECIALVARS && $File::Find::topmode;
+                    local $File::Find::topnlink = $_UTF8->decode($File::Find::topnlink, $UTF8_CHECK) if $SPECIALVARS && $File::Find::topnlink;
+                    return $org_proc{$proc}->(@_);
                 };
             }
         }
         # Encode arguments as utf-8 so that the original File::Find receives bytes
-        @args = map { encode('UTF-8', $_) } @_;
+        @args = map { $_ ? $_UTF8->encode($_, $UTF8_CHECK) : $_ } @_;
     }
 
     # Make sure warning level propagates to File::Find
