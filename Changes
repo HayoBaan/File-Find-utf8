@@ -1,6 +1,8 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+
+0.007     2015-01-15
   * Forgot to exclude utf8_check test when run on Windows/OS2/DOS
   * Now decoding arguments to processors, also not decoding
     unavailable vars in pre-/postprocessors
