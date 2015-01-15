@@ -1,8 +1,14 @@
 #!perl
 use strict;
 use warnings;
+use Test::More;
 use Test::Warn;
-use Test::Exception tests => 3;
+use Test::Exception;
+
+plan skip_all => "Skipped: $^O does not have proper utf-8 file system support"
+    if ($^O =~ /MSWin32|cygwin|dos|os2/);
+
+plan tests => 3;
 
 # Tests whether setting $File::Find::utf8::UTF8_CHECK has the required result
 
