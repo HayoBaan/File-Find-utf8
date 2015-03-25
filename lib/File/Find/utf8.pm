@@ -147,7 +147,7 @@ sub import {
     # Determine symbols to export
     shift; # First argument contains the package (that's us)
     @_ = (':DEFAULT') if !@_; # If nothing provided, use default
-    @_ = map { $_ eq ':none' ? () : $_ } @_; # Replace :none tag with empty list
+    @_ = grep { $_ ne ':none' } @_; # Strip :none tag
 
     # Use exporter to export
     require Exporter;
@@ -204,7 +204,8 @@ sub _utf8_find {
                 $find_options_hash{$proc} = sub {
                     # Decode the file variables so they become characters
                     local $File::Find::dir = $_UTF8->decode($File::Find::dir, $UTF8_CHECK) if $File::Find::dir;
-                    return $org_proc{$proc}->(map { $_ ? $_UTF8->decode($_, $UTF8_CHECK) : $_ } @_);
+                    # Decode the arguments and encode the results
+                    return map { $_ ? $_UTF8->encode($_, $UTF8_CHECK) : $_ } $org_proc{$proc}->(map { $_ ? $_UTF8->decode($_, $UTF8_CHECK) : $_ } @_);
                 };
             }
         }
