@@ -7,7 +7,7 @@ use Test::Exception tests => 5;
 # Each test is performed in its own package to prevent one use
 # statement influencing the other.
 
-# Arguments to File::find(depth) define an empty test, not finding anything
+# Arguments to File::Find::find(depth), defines an empty test, not finding anything
 my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
 
 # Correct handling of the :none tag
