@@ -2,6 +2,12 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.009     2015-04-10
+  * Fixed: encoding of processor return values
+  * Corrected minimum version requirement
+  * Corrected typo in MANIFEST.SKIP
+  * Corrected typo in comment in import.t test
+
 0.008     2015-01-16
   * Corrected END for find.t
   
