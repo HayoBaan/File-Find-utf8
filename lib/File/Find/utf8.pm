@@ -6,10 +6,10 @@ use 5.010; # state
 # ABSTRACT: Fully UTF-8 aware File::Find
 # VERSION
 
+=head1 SYNOPSIS
+
 =for test_synopsis
 my @directories_to_search;
-
-=head1 SYNOPSIS
 
     # Use the utf-8 versions of find and finddepth
     use File::Find::utf8;
