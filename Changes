@@ -2,6 +2,11 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.010     2016-08-10
+  * Amendments for Test::Synopsis > v0.13
+  * Removed Build.PL, require >= v0.009 of PluginBundle
+  * Updated author e-mail address
+
 0.009     2015-04-10
   * Fixed: encoding of processor return values
   * Corrected minimum version requirement
