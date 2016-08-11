@@ -15,6 +15,7 @@ plan tests => 3;
 use Encode ();
 use File::Find::utf8;
 no warnings 'File::Find'; # Turn off File::Find warnings
+no warnings FATAL => 'utf8'; # disable fatal utf8 warnings
 
 # Arguments to find, with an illegal Unicode character
 my @find_args = ( sub { }, "Illegal \x{d800} character" );
