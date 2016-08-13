@@ -117,7 +117,7 @@ ignore them. Please see L<Encode> for details. Note: C<Encode::LEAVE_SRC> is
 I<always> enforced.
 =cut
 
-our $UTF8_CHECK = Encode::FB_CROAK; # Die on encoding errors
+our $UTF8_CHECK = Encode::FB_CROAK | Encode::LEAVE_SRC; # Die on encoding errors
 
 # UTF-8 Encoding object
 my $_UTF8 = Encode::find_encoding('UTF-8');
@@ -169,12 +169,11 @@ sub _utf8_find {
     # Holds the (possibly encoded) arguments
     my @args = @_;
 
-    # Enforce LEAVE_SRC
-    $UTF8_CHECK |= Encode::LEAVE_SRC if $UTF8_CHECK;
-
     # Get the hint from the caller (one level deeper if called from finddepth)
     my $hints = ((caller 1)[3]//'') ne 'File::Find::utf8::_utf8_finddepth' ? (caller 0)[10] : (caller 1)[10];
     if ($hints->{$current_package}) {
+        $UTF8_CHECK |= Encode::LEAVE_SRC if $UTF8_CHECK; # Enforce LEAVE_SRC
+
         # Save original processors
         my %org_proc;
         for my $proc ("wanted", "preprocess", "postprocess") { $org_proc{$proc} = $find_options_hash{$proc}; }
