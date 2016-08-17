@@ -1,6 +1,10 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+  * Fixed misplaced SYNOPSIS
+  * Only updating $UTF8_CHECK when necessary
+  * Added Travis and AppVeyor testing
+  * Prevent "UTF-16 surrogate 0xd800" error in some builds' tests
 
 0.010     2016-08-10
   * Amendments for Test::Synopsis > v0.13
@@ -15,7 +19,7 @@ Revision history for Perl module {{$dist->name}}
 
 0.008     2015-01-16
   * Corrected END for find.t
-  
+
 0.007     2015-01-15
   * Forgot to exclude utf8_check test when run on Windows/OS2/DOS
   * Now decoding arguments to processors, also not decoding
@@ -44,7 +48,7 @@ Revision history for Perl module {{$dist->name}}
 0.003     2014-12-24
   * Rewrote warning level tests to also fail when run as admin
     The test should now work well on all systems/circumstances
-    
+
 0.002     2014-12-22
   * Not testing warnings::fatal_enabled if not present (i.e. Perl < 5.12)
   * Allowing Win32 platform
