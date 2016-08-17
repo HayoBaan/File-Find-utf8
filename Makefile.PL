@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Fully UTF-8 aware File::Find",
-  "AUTHOR" => "Hayo Baan <hayobaan\@cpan.org>",
+  "AUTHOR" => "Hayo Baan <info\@hayobaan.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "blib" => "1.01",
     "open" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }

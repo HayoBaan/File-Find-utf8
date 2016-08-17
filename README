@@ -4,9 +4,25 @@ NAME
 
 VERSION
 
-    version 0.010
+    version 0.011
 
 SYNOPSIS
+
+        # Use the utf-8 versions of find and finddepth
+        use File::Find::utf8;
+        find(\&wanted, @directories_to_search);
+    
+        # Revert back to non-utf-8 versions
+        no File::Find::utf8;
+        finddepth(\&wanted, @directories_to_search);
+    
+        # Export only the find function
+        use File::Find::utf8 qw(find);
+        find(\&wanted, @directories_to_search);
+    
+        # Export no functions
+        use File::Find::utf8 qw(:none); # NOT "use File::Find::utf8 qw();"!
+        File::Find::find(\&wanted, @directories_to_search);
 
 DESCRIPTION
 
@@ -60,22 +76,6 @@ ATTRIBUTES
     Encode::FB_DEFAULT will completely ignore them. Please see Encode for
     details. Note: Encode::LEAVE_SRC is always enforced.
 
-        # Use the utf-8 versions of find and finddepth
-        use File::Find::utf8;
-        find(\&wanted, @directories_to_search);
-    
-        # Revert back to non-utf-8 versions
-        no File::Find::utf8;
-        finddepth(\&wanted, @directories_to_search);
-    
-        # Export only the find function
-        use File::Find::utf8 qw(find);
-        find(\&wanted, @directories_to_search);
-    
-        # Export no functions
-        use File::Find::utf8 qw(:none); # NOT "use File::Find::utf8 qw();"!
-        File::Find::find(\&wanted, @directories_to_search);
-
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
@@ -102,7 +102,7 @@ SEE ALSO
 
 AUTHOR
 
-    Hayo Baan <hayobaan@cpan.org>
+    Hayo Baan <info@hayobaan.com>
 
 COPYRIGHT AND LICENSE
 
