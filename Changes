@@ -2,6 +2,9 @@ Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
 
+0.012     2017-04-22
+  * Adpated to changes in Encode v2.89 [gh-1]
+
 0.011     2016-08-17
   * Fixed misplaced SYNOPSIS
   * Only updating $UTF8_CHECK when necessary
