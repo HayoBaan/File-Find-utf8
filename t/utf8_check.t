@@ -26,18 +26,18 @@ my @find_args = ( sub { }, "Illegal \x{d800} character" );
           {
               find(@find_args);
           }
-          qr/"\\x\{d800\}" does not map to utf8/,
+          qr/"\\x\{d800\}" does not map to (utf8|UTF-8)/,
           'croak on encoding error (default)';
 }
 
 # Warn on faulty utf-8
 {
     local $File::Find::utf8::UTF8_CHECK = Encode::FB_WARN;
-    Test::Warn::warning_is
+    Test::Warn::warning_like
           {
               find(@find_args);
           }
-          qq("\\x\{d800\}" does not map to utf8),
+          qr/"\\x\{d800\}" does not map to (utf8|UTF-8)/,
           'warn on encoding error';
 }
 
