@@ -127,9 +127,6 @@ our $UTF8_CHECK = Encode::FB_CROAK | Encode::LEAVE_SRC; # Die on encoding errors
 my $_UTF8 = Encode::find_encoding('UTF-8');
 
 sub import {
-    # Target package (i.e., the one loading this module)
-    my $target_package = caller;
-
     # If run on the dos/os2/windows platform, ignore overriding functions silently.
     # These platforms do not have (proper) utf-8 file system suppport...
     unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
@@ -155,7 +152,10 @@ sub import {
 
     # Use exporter to export
     require Exporter;
-    Exporter::export_to_level($original_package, 1, $target_package, @_) if (@_);
+    if (@_) {
+        @_ = ($original_package, @_);
+        goto &Exporter::import;
+    }
 
     return;
 }

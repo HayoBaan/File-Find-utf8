@@ -1,6 +1,7 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+  * Fixes for File::Find no longer using exporter [gh-3]
 
 0.013     2017-05-18
   * Requiring File::Path 2.06_06 for remove_tree
