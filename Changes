@@ -1,6 +1,8 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+
+0.014     2022-02-16
   * Fixes for File::Find no longer using exporter [gh-3]
 
 0.013     2017-05-18
