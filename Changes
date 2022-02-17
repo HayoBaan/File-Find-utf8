@@ -1,6 +1,7 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+  * Create a temporary directory with File::Temp
 
 0.014     2022-02-16
   * Fixes for File::Find no longer using exporter [gh-3]
