@@ -6,7 +6,7 @@ File::Find::utf8 - Fully UTF-8 aware File::Find
 
 # VERSION
 
-version 0.016
+version 0.016\_001
 
 # SYNOPSIS
 
@@ -38,7 +38,7 @@ aware versions, both expecting and returning characters.
 **Note:** Replacement of functions is not done on DOS, Windows, and OS/2
 as these systems do not have full UTF-8 file system support.
 
-## Behaviour
+## Behavior
 
 The module behaves as a pragma so you can use both `use
 File::Find::utf8` and `no File::Find::utf8` to turn utf-8 support on

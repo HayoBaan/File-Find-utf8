@@ -12,25 +12,25 @@ my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
 
 # Correct handling of the :none tag
 {
-    package test_none;
+    package TestNone;
     use File::Find::utf8 qw(:none);
     Test::Exception::throws_ok
         {
             find(@findargs);
         }
-        qr/Undefined subroutine &test_none::find called/,
+        qr/Undefined subroutine &TestNone::find called/,
         ':none correctly imported';
 }
 
 # Correct handling of !find
 {
-    package test_notfind;
+    package TestNotFind;
     use File::Find::utf8 qw(!find);
     Test::Exception::throws_ok
           {
               find(@findargs);
           }
-          qr/Undefined subroutine &test_notfind::find called/,
+          qr/Undefined subroutine &TestNotFind::find called/,
           'find correctly not imported with !find';
     Test::Exception::lives_ok
           {
@@ -41,7 +41,7 @@ my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
 
 # Correct handling of /find/
 {
-    package test_re;
+    package TestRe;
     use File::Find::utf8 qw(/find/);
     Test::Exception::lives_ok
     {
@@ -53,7 +53,7 @@ my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
 
 # Correct handling of invalid symbol
 {
-    package test_invalid;
+    package TestInvalid;
     require File::Find::utf8;
     Test::Exception::throws_ok
           {

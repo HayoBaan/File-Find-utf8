@@ -43,7 +43,7 @@ aware versions, both expecting and returning characters.
 B<Note:> Replacement of functions is not done on DOS, Windows, and OS/2
 as these systems do not have full UTF-8 file system support.
 
-=head2 Behaviour
+=head2 Behavior
 
 The module behaves as a pragma so you can use both C<use
 File::Find::utf8> and C<no File::Find::utf8> to turn utf-8 support on
