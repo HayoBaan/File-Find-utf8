@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Fully UTF-8 aware File::Find",
-  "AUTHOR" => "Hayo Baan <info\@hayobaan.com>",
+  "AUTHOR" => "Hayo Baan (it at hayobaan.nl)",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },

@@ -4,6 +4,7 @@ Revision history for Perl module {{$dist->name}}
   * Documentation uses American English spelling
   * Test packages renamed to UpperCamelCase (naming conventions)
   * The Markdown README is now README.md (was README.mkdn)
+  * Updated the author contact address and extended the copyright years to 2026
 
 0.016     2026-01-18
   * Skipping tests when installing dependencies in AppVeyor build
