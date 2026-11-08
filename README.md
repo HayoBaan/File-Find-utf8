@@ -28,57 +28,59 @@ version 0.016\_001
 
 # DESCRIPTION
 
-While the original [File::Find](https://metacpan.org/pod/File%3A%3AFind) functions are capable of handling
-UTF-8 quite well, they expect and return all data as bytes, not as
-characters.
+While the original [File::Find](https://metacpan.org/pod/File%3A%3AFind) functions are capable of handling UTF-8 quite well, they expect and
+return all data as bytes, not as characters.
 
-This module replaces the [File::Find](https://metacpan.org/pod/File%3A%3AFind) functions with fully UTF-8
-aware versions, both expecting and returning characters.
+This module replaces the [File::Find](https://metacpan.org/pod/File%3A%3AFind) functions with fully UTF-8 aware versions, both expecting and
+returning characters.
 
-**Note:** Replacement of functions is not done on DOS, Windows, and OS/2
-as these systems do not have full UTF-8 file system support.
+**Note:** Replacement of functions is not done on DOS, Windows, and OS/2 as these systems do not have
+full UTF-8 file system support.
 
 ## Behavior
 
-The module behaves as a pragma so you can use both `use
-File::Find::utf8` and `no File::Find::utf8` to turn utf-8 support on
-or off.
+The module behaves as a pragma so you can use both `use File::Find::utf8` and
+`no File::Find::utf8` to turn utf-8 support on or off.
 
-By default, both find() and finddepth() are exported (as with the original
-[File::Find](https://metacpan.org/pod/File%3A%3AFind)), if you want to prevent this, use `use File::Find::utf8
-qw(:none)`. (As all the magic happens in the module's import function,
-you can not simply use `use File::Find::utf8 qw()`)
+By default, both find() and finddepth() are exported (as with the original [File::Find](https://metacpan.org/pod/File%3A%3AFind)), if you
+want to prevent this, use `use File::Find::utf8 qw(:none)`. (As all the magic happens in the
+module's import function, you can not simply use `use File::Find::utf8 qw()`)
 
-[File::Find](https://metacpan.org/pod/File%3A%3AFind) warning levels are properly propagated. Note though that
-for propagation of fatal [File::Find](https://metacpan.org/pod/File%3A%3AFind) warnings, Perl 5.12 or higher
-is required (or the appropriate version of [warnings](https://metacpan.org/pod/warnings)).
+[File::Find](https://metacpan.org/pod/File%3A%3AFind) warning levels are properly propagated. Note though that for propagation of fatal
+[File::Find](https://metacpan.org/pod/File%3A%3AFind) warnings, Perl 5.12 or higher is required (or the appropriate version of [warnings](https://metacpan.org/pod/warnings)).
 
 # ATTRIBUTES
 
 ## $File::Find::utf8::SPECIALVARS
 
-By default `File::Find::utf8` only decodes the _normal_
-[File::Find](https://metacpan.org/pod/File%3A%3AFind) variables `$_`, `$File::Find::name`,
-`$File::Find::dir`, and (when `follow` or `follow_fast` is in
-effect) `$File::Find::fullname` for use in the `preprocess`,
-`wanted`, and `postporcess` functions.
+By default `File::Find::utf8` only decodes the _normal_ [File::Find](https://metacpan.org/pod/File%3A%3AFind) variables for use in the
+`preprocess`, `wanted`, and `postprocess` functions:
 
-If for any reason (e.g., compatibility with find.pl or find2perl) you
-also need the _special_ variables `$File::Find::topdir`,
-`$File::Find::topdev`, `$File::Find::topino`,
-`$File::Find::topmode`, and `$File::Find::topnlink` to be decoded,
-specify `local $File::Find::utf8::COMPATILBILITY = 1;` in your
-code. The extra decoding that needs to happen will impact performance
-though, so use only when absolutely necessary.
+- `$_`
+- `$File::Find::name`
+- `$File::Find::dir`
+- `$File::Find::fullname`, when `follow` or `follow_fast` is in effect
+
+If for any reason (e.g., compatibility with find.pl or find2perl) you also need the _special_
+variables to be decoded, specify `local $File::Find::utf8::SPECIALVARS = 1;` in your code. These
+are:
+
+- `$File::Find::topdir`
+- `$File::Find::topdev`
+- `$File::Find::topino`
+- `$File::Find::topmode`
+- `$File::Find::topnlink`
+
+The extra decoding that needs to happen will impact performance, so use it only when absolutely
+necessary.
 
 ## $File::Find::utf8::UTF8\_CHECK
 
-By default `File::Find::utf8` marks decoding errors as fatal (default value
-for this setting is `Encode::FB_CROAK`). If you want, you can change this by
-setting `File::Find::utf8::UTF8_CHECK`. The value `Encode::FB_WARN` reports
-the encoding errors as warnings, and `Encode::FB_DEFAULT` will completely
-ignore them. Please see [Encode](https://metacpan.org/pod/Encode) for details. Note: `Encode::LEAVE_SRC` is
-_always_ enforced.
+By default `File::Find::utf8` marks decoding errors as fatal (default value for this setting is
+`Encode::FB_CROAK`). If you want, you can change this by setting `File::Find::utf8::UTF8_CHECK`.
+The value `Encode::FB_WARN` reports the encoding errors as warnings, and `Encode::FB_DEFAULT` will
+completely ignore them. Please see [Encode](https://metacpan.org/pod/Encode) for details. Note: `Encode::LEAVE_SRC` is _always_
+enforced.
 
 # BUGS
 
@@ -91,9 +93,8 @@ feature.
 
 # COMPATIBILITY
 
-The filesystems of Dos, Windows, and OS/2 do not (fully) support
-UTF-8. The [File::Find](https://metacpan.org/pod/File%3A%3AFind) function will therefore not be replaced on these
-systems.
+The filesystems of Dos, Windows, and OS/2 do not (fully) support UTF-8. The [File::Find](https://metacpan.org/pod/File%3A%3AFind) function
+will therefore not be replaced on these systems.
 
 # SEE ALSO
 

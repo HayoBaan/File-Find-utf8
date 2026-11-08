@@ -3,8 +3,7 @@ use strict;
 use warnings;
 use Test::Exception tests => 5;
 
-# Test the various import combinations.
-# Each test is performed in its own package to prevent one use
+# Test the various import combinations. Each test is performed in its own package to prevent one use
 # statement influencing the other.
 
 # Arguments to File::Find::find(depth), defines an empty test, not finding anything

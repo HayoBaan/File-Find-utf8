@@ -55,17 +55,32 @@ ATTRIBUTES
  $File::Find::utf8::SPECIALVARS
 
     By default File::Find::utf8 only decodes the normal File::Find
-    variables $_, $File::Find::name, $File::Find::dir, and (when follow or
-    follow_fast is in effect) $File::Find::fullname for use in the
-    preprocess, wanted, and postporcess functions.
+    variables for use in the preprocess, wanted, and postprocess functions:
+
+      * $_
+
+      * $File::Find::name
+
+      * $File::Find::dir
+
+      * $File::Find::fullname, when follow or follow_fast is in effect
 
     If for any reason (e.g., compatibility with find.pl or find2perl) you
-    also need the special variables $File::Find::topdir,
-    $File::Find::topdev, $File::Find::topino, $File::Find::topmode, and
-    $File::Find::topnlink to be decoded, specify local
-    $File::Find::utf8::COMPATILBILITY = 1; in your code. The extra decoding
-    that needs to happen will impact performance though, so use only when
-    absolutely necessary.
+    also need the special variables to be decoded, specify local
+    $File::Find::utf8::SPECIALVARS = 1; in your code. These are:
+
+      * $File::Find::topdir
+
+      * $File::Find::topdev
+
+      * $File::Find::topino
+
+      * $File::Find::topmode
+
+      * $File::Find::topnlink
+
+    The extra decoding that needs to happen will impact performance, so use
+    it only when absolutely necessary.
 
  $File::Find::utf8::UTF8_CHECK
 

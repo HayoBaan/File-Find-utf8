@@ -33,36 +33,31 @@ my @directories_to_search;
 
 =head1 DESCRIPTION
 
-While the original L<File::Find> functions are capable of handling
-UTF-8 quite well, they expect and return all data as bytes, not as
-characters.
+While the original L<File::Find> functions are capable of handling UTF-8 quite well, they expect and
+return all data as bytes, not as characters.
 
-This module replaces the L<File::Find> functions with fully UTF-8
-aware versions, both expecting and returning characters.
+This module replaces the L<File::Find> functions with fully UTF-8 aware versions, both expecting and
+returning characters.
 
-B<Note:> Replacement of functions is not done on DOS, Windows, and OS/2
-as these systems do not have full UTF-8 file system support.
+B<Note:> Replacement of functions is not done on DOS, Windows, and OS/2 as these systems do not have
+full UTF-8 file system support.
 
 =head2 Behavior
 
-The module behaves as a pragma so you can use both C<use
-File::Find::utf8> and C<no File::Find::utf8> to turn utf-8 support on
-or off.
+The module behaves as a pragma so you can use both C<use File::Find::utf8> and
+C<no File::Find::utf8> to turn utf-8 support on or off.
 
-By default, both find() and finddepth() are exported (as with the original
-L<File::Find>), if you want to prevent this, use C<use File::Find::utf8
-qw(:none)>. (As all the magic happens in the module's import function,
-you can not simply use C<use File::Find::utf8 qw()>)
+By default, both find() and finddepth() are exported (as with the original L<File::Find>), if you
+want to prevent this, use C<use File::Find::utf8 qw(:none)>. (As all the magic happens in the
+module's import function, you can not simply use C<use File::Find::utf8 qw()>)
 
-L<File::Find> warning levels are properly propagated. Note though that
-for propagation of fatal L<File::Find> warnings, Perl 5.12 or higher
-is required (or the appropriate version of L<warnings>).
+L<File::Find> warning levels are properly propagated. Note though that for propagation of fatal
+L<File::Find> warnings, Perl 5.12 or higher is required (or the appropriate version of L<warnings>).
 
 =head1 COMPATIBILITY
 
-The filesystems of Dos, Windows, and OS/2 do not (fully) support
-UTF-8. The L<File::Find> function will therefore not be replaced on these
-systems.
+The filesystems of Dos, Windows, and OS/2 do not (fully) support UTF-8. The L<File::Find> function
+will therefore not be replaced on these systems.
 
 =head1 SEE ALSO
 
@@ -93,19 +88,41 @@ $Carp::Internal{$current_package}++; # To get warnings reported at correct calle
 
 =attr $File::Find::utf8::SPECIALVARS
 
-By default C<File::Find::utf8> only decodes the I<normal>
-L<File::Find> variables C<$_>, C<$File::Find::name>,
-C<$File::Find::dir>, and (when C<follow> or C<follow_fast> is in
-effect) C<$File::Find::fullname> for use in the C<preprocess>,
-C<wanted>, and C<postporcess> functions.
+By default C<File::Find::utf8> only decodes the I<normal> L<File::Find> variables for use in the
+C<preprocess>, C<wanted>, and C<postprocess> functions:
 
-If for any reason (e.g., compatibility with find.pl or find2perl) you
-also need the I<special> variables C<$File::Find::topdir>,
-C<$File::Find::topdev>, C<$File::Find::topino>,
-C<$File::Find::topmode>, and C<$File::Find::topnlink> to be decoded,
-specify C<local $File::Find::utf8::COMPATILBILITY = 1;> in your
-code. The extra decoding that needs to happen will impact performance
-though, so use only when absolutely necessary.
+=over 4
+
+=item * C<$_>
+
+=item * C<$File::Find::name>
+
+=item * C<$File::Find::dir>
+
+=item * C<$File::Find::fullname>, when C<follow> or C<follow_fast> is in effect
+
+=back
+
+If for any reason (e.g., compatibility with find.pl or find2perl) you also need the I<special>
+variables to be decoded, specify C<local $File::Find::utf8::SPECIALVARS = 1;> in your code. These
+are:
+
+=over 4
+
+=item * C<$File::Find::topdir>
+
+=item * C<$File::Find::topdev>
+
+=item * C<$File::Find::topino>
+
+=item * C<$File::Find::topmode>
+
+=item * C<$File::Find::topnlink>
+
+=back
+
+The extra decoding that needs to happen will impact performance, so use it only when absolutely
+necessary.
 
 =cut
 
@@ -113,12 +130,11 @@ our $SPECIALVARS = 0;
 
 =attr $File::Find::utf8::UTF8_CHECK
 
-By default C<File::Find::utf8> marks decoding errors as fatal (default value
-for this setting is C<Encode::FB_CROAK>). If you want, you can change this by
-setting C<File::Find::utf8::UTF8_CHECK>. The value C<Encode::FB_WARN> reports
-the encoding errors as warnings, and C<Encode::FB_DEFAULT> will completely
-ignore them. Please see L<Encode> for details. Note: C<Encode::LEAVE_SRC> is
-I<always> enforced.
+By default C<File::Find::utf8> marks decoding errors as fatal (default value for this setting is
+C<Encode::FB_CROAK>). If you want, you can change this by setting C<File::Find::utf8::UTF8_CHECK>.
+The value C<Encode::FB_WARN> reports the encoding errors as warnings, and C<Encode::FB_DEFAULT> will
+completely ignore them. Please see L<Encode> for details. Note: C<Encode::LEAVE_SRC> is I<always>
+enforced.
 =cut
 
 our $UTF8_CHECK = Encode::FB_CROAK | Encode::LEAVE_SRC; # Die on encoding errors
@@ -127,16 +143,16 @@ our $UTF8_CHECK = Encode::FB_CROAK | Encode::LEAVE_SRC; # Die on encoding errors
 my $_UTF8 = Encode::find_encoding('UTF-8');
 
 sub import {
-    # If run on the dos/os2/windows platform, ignore overriding functions silently.
-    # These platforms do not have (proper) utf-8 file system suppport...
+    # If run on the dos/os2/windows platform, ignore overriding functions silently. These platforms
+    # do not have (proper) utf-8 file system suppport...
     unless ($^O =~ /MSWin32|cygwin|dos|os2/) {
         no strict qw(refs); ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no warnings qw(redefine);
 
         # Redefine each of the functions to their UTF-8 equivalent
         for my $f (@{$original_package . '::EXPORT'}, @{$original_package . '::EXPORT_OK'}) {
-            # If we already have the _orig_function, we have redefined the function
-            # in an earlier load of this module, so we need not do it again
+            # If we already have the _orig_function, we have redefined the function in an earlier
+            # load of this module, so we need not do it again
             unless ($_orig_functions{$f}) {
                 $_orig_functions{$f} = \&{$original_package . '::' . $f};
                 *{$original_package . '::' . $f} = \&{"_utf8_$f"};
@@ -192,8 +208,8 @@ sub _utf8_find {
                 local $File::Find::name     = $_UTF8->decode($File::Find::name,     $UTF8_CHECK) if $File::Find::name;
                 local $File::Find::dir      = $_UTF8->decode($File::Find::dir,      $UTF8_CHECK) if $File::Find::dir;
                 local $File::Find::fullname = $_UTF8->decode($File::Find::fullname, $UTF8_CHECK) if $follow_option && $File::Find::fullname;
-                # These are only necessary for compatibility reasons (find.pl, find2perl).
-                # If you need them, set $File::Find::utf8::SPECIALVARS
+                # These are only necessary for compatibility reasons (find.pl, find2perl). If you
+                # need them, set $File::Find::utf8::SPECIALVARS
                 local $File::Find::topdir   = $_UTF8->decode($File::Find::topdir,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdir;
                 local $File::Find::topdev   = $_UTF8->decode($File::Find::topdev,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topdev;
                 local $File::Find::topino   = $_UTF8->decode($File::Find::topino,   $UTF8_CHECK) if $SPECIALVARS && $File::Find::topino;

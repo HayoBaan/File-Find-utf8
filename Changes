@@ -1,6 +1,9 @@
 Revision history for Perl module {{$dist->name}}
 
 {{$NEXT}}
+  * Documentation: the variable that also decodes the special variables is
+    $File::Find::utf8::SPECIALVARS (the documentation named a variable that
+    doesn't exist)
   * Documentation uses American English spelling
   * Test packages renamed to UpperCamelCase (naming conventions)
   * The Markdown README is now README.md (was README.mkdn)
