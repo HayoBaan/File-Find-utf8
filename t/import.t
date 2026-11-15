@@ -7,57 +7,53 @@ use Test::Exception tests => 5;
 # statement influencing the other.
 
 # Arguments to File::Find::find(depth), defines an empty test, not finding anything
-my @findargs = ( { preprocess => sub { () }, wanted => sub { } }, '.' );
+my @findargs = ({ preprocess => sub { () }, wanted => sub { } }, '.');
 
 # Correct handling of the :none tag
 {
-    package TestNone;
-    use File::Find::utf8 qw(:none);
-    Test::Exception::throws_ok
-        {
-            find(@findargs);
-        }
-        qr/Undefined subroutine &TestNone::find called/,
-        ':none correctly imported';
+
+  package TestNone;
+  use File::Find::utf8 qw(:none);
+  Test::Exception::throws_ok {
+    find(@findargs);
+  }
+  qr/Undefined subroutine &TestNone::find called/, ':none correctly imported';
 }
 
 # Correct handling of !find
 {
-    package TestNotFind;
-    use File::Find::utf8 qw(!find);
-    Test::Exception::throws_ok
-          {
-              find(@findargs);
-          }
-          qr/Undefined subroutine &TestNotFind::find called/,
-          'find correctly not imported with !find';
-    Test::Exception::lives_ok
-          {
-              finddepth(@findargs);
-          }
-          'finddepth correctly imported with !find';
+
+  package TestNotFind;
+  use File::Find::utf8 qw(!find);
+  Test::Exception::throws_ok {
+    find(@findargs);
+  }
+  qr/Undefined subroutine &TestNotFind::find called/, 'find correctly not imported with !find';
+  Test::Exception::lives_ok {
+    finddepth(@findargs);
+  }
+  'finddepth correctly imported with !find';
 }
 
 # Correct handling of /find/
 {
-    package TestRe;
-    use File::Find::utf8 qw(/find/);
-    Test::Exception::lives_ok
-    {
-        find(@findargs);
-        finddepth(@findargs);
-    }
-    'find and finddepth correctly imported with /find/';
+
+  package TestRe;
+  use File::Find::utf8 qw(/find/);
+  Test::Exception::lives_ok {
+    find(@findargs);
+    finddepth(@findargs);
+  }
+  'find and finddepth correctly imported with /find/';
 }
 
 # Correct handling of invalid symbol
 {
-    package TestInvalid;
-    require File::Find::utf8;
-    Test::Exception::throws_ok
-          {
-              File::Find::utf8->import(qw(invalid_symbol));
-          }
-          qr/"invalid_symbol" is not exported by the File::Find module/,
-          'invalid symbol correctly noted';
+
+  package TestInvalid;
+  require File::Find::utf8;
+  Test::Exception::throws_ok {
+    File::Find::utf8->import(qw(invalid_symbol));
+  }
+  qr/"invalid_symbol" is not exported by the File::Find module/, 'invalid symbol correctly noted';
 }
